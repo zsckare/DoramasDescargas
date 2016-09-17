@@ -4,7 +4,7 @@ package xyz.zsckare.doramasdownloader.Models;
  * Created by katty on 16/09/16.
  */
 public class ThumbChapterModel {
-    String name, url;
+    String name, url, img_url;
 
     public ThumbChapterModel(String name, String url) {
         this.name = name;

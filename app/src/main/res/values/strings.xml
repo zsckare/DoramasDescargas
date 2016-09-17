@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DoramasDownloader</string>
+    <string name="getChapter">Obteniedo Informacion del Capitulo</string>
+    <string name="wait">Espere por Favor</string>
+    <string name="download">Descargar</string>
+    <string name="loading_series">Cargando Series</string>
 </resources>

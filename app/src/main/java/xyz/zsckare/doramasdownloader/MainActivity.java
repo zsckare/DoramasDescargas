@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import xyz.zsckare.doramasdownloader.Helpers.DoramasAdapter;
 import xyz.zsckare.doramasdownloader.Helpers.DownloadsFuckingHelper;
 import xyz.zsckare.doramasdownloader.Models.IframeLink;
 import xyz.zsckare.doramasdownloader.Views.ChapterActivity;
@@ -41,8 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     static String main_url = "http://estrenosdoramas.org/";
     static String name = "";
-    static LinkedList<String>list_chapters_name = new LinkedList();
+    public static LinkedList<String>list_chapters_name = new LinkedList();
     static LinkedList<String>list_chapters_urls = new LinkedList();
+    public static LinkedList<String>list_img_urls = new LinkedList();
 
     static ListView listViewChapters;
     MaterialDialog progressDialog, progressInicio;
@@ -54,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         MaterialDialog.Builder builderInicio = new MaterialDialog.Builder(this)
-                .content("Cargando Series")
+                .content(R.string.loading_series)
+                .title(R.string.wait)
                 .progress(true, 0);
 
         progressInicio = builderInicio.build();
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String url = list_chapters_urls.get(itemPosition);
                 //Toast.makeText(MainActivity.this, "url ==>"+url, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, list_img_urls.get(position), Toast.LENGTH_SHORT).show();
                 progressDialog.show();
                 getInfo(url);
 
@@ -94,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
-                .title("Obteniedo Informacion del Capitulo")
-                .content("Espere")
+                .title(R.string.getChapter)
+                .content(R.string.wait)
                 .progress(true, 0);
 
 
@@ -121,14 +125,17 @@ public class MainActivity extends AppCompatActivity {
                     Document doc = Jsoup.connect(main_url).userAgent("Mozilla").timeout(5000).get();
                     Elements links = doc.select("div.thumb-cap");
                     Elements links_text = doc.select("div.thumb-cap > strong > a");
-                    Log.d("size",""+links.size());
+                    Elements images = doc.select("div.thumb-cap > a > img");
+                    Log.d("size",""+images.size());
                     Log.d("size",""+links_text.size());
 
-                    for (Element link_text : links_text) {
-                        Log.d("text",link_text.text());
-                        Log.d("href",link_text.attr("href"));
-                        list_chapters_name.add(link_text.text());
-                        list_chapters_urls.add(link_text.attr("href"));
+                    for (int i = 0; i <links_text.size() ; i++) {
+                        Log.d("text",links_text.get(i).text());
+                        Log.d("href",links_text.get(i).attr("href"));
+                        Log.d("img","--->"+images.get(i).attr("src"));
+                        list_chapters_name.add(links_text.get(i).text());
+                        list_chapters_urls.add(links_text.get(i).attr("href"));
+                        list_img_urls.add(images.get(i).attr("src"));
                     }
 
                     fillList();
@@ -155,11 +162,14 @@ public class MainActivity extends AppCompatActivity {
     private void fillList(){
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, list_chapters_name);
+
+        final DoramasAdapter mLeadsAdapter = new DoramasAdapter(this,
+                list_chapters_name);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                listViewChapters.setAdapter(adapter);
+                listViewChapters.setAdapter(mLeadsAdapter);
                 progressInicio.dismiss();
             }
         });
@@ -288,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
                     new MaterialDialog.Builder(MainActivity.this)
                             .title(name)
                             .content("¿Deseas descargar "+name+"?")
-                            .positiveText("descargar")
+                            .positiveText(R.string.download)
                             .neutralText("Ver Online")
                             .onNeutral(new MaterialDialog.SingleButtonCallback() {
                                 @Override
