@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -288,6 +289,16 @@ public class MainActivity extends AppCompatActivity {
                             .title(name)
                             .content("¿Deseas descargar "+name+"?")
                             .positiveText("descargar")
+                            .neutralText("Ver Online")
+                            .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                                    Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+                                    mediaIntent.setDataAndType(Uri.parse(Comun.main_url), "video/*");
+                                    startActivity(mediaIntent);
+                                }
+                            })
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
