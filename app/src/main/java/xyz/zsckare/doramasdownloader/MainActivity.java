@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 .progress(true, 0);
 
         progressInicio = builderInicio.build();
-        progressInicio.show();
+
 
         listViewChapters = (ListView)findViewById(R.id.list_view_chapters);
         try {
@@ -73,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
         listViewChapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 int itemPosition     = position;
 
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
    private void getLastChapters() throws IOException, NetworkOnMainThreadException {
-
+       progressInicio.show();
        Log.d("------>","<-----");
         Thread thread = new Thread(new Runnable()
         {
@@ -144,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 catch (Exception e)
                 {
+
                     showErr();
                     e.printStackTrace();
                 }
@@ -154,10 +154,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void showErr(){
 
-    public static void showErr(){
-        Log.d("------->","ERROR");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                progressInicio.dismiss();
+                new MaterialDialog.Builder(MainActivity.this)
+                        .title(R.string.error)
+                        .content(R.string.error_text)
+                        .positiveText(R.string.load_again)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                try {
+                                    getLastChapters();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
+
     }
+
+
 
     private void fillList(){
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
