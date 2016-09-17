@@ -15,6 +15,7 @@ import java.util.List;
 
 import xyz.zsckare.doramasdownloader.MainActivity;
 import xyz.zsckare.doramasdownloader.R;
+import xyz.zsckare.doramasdownloader.Views.HomeActivity;
 
 
 public class DoramasAdapter  extends ArrayAdapter<String> {
@@ -42,8 +43,8 @@ public class DoramasAdapter  extends ArrayAdapter<String> {
 
         // Lead actual.
         //Lead lead = getItem(position);
-        String img = MainActivity.list_img_urls.get(position);
-        String title = MainActivity.list_chapters_name.get(position);
+        String img = HomeActivity.list_img_urls.get(position);
+        String title = HomeActivity.list_chapters_name.get(position);
         // Setup.
         Picasso.with(getContext()).load(img).into(avatar);
        // Glide.with(getContext()).load(lead.getImage()).into(avatar);

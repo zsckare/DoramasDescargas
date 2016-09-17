@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout android:id="@+id/swipyrefreshlayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:srl_direction="top"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="20dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="40dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/last_chapters"
+            android:textColor="#000"
+            android:layout_marginLeft="23dp"
+            />
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             />
+    </LinearLayout>
+
+
+</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
