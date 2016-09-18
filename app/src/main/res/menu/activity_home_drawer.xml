@@ -14,7 +14,10 @@
             android:id="@+id/az"
             android:icon="@drawable/ic_sort_by_alpha_black_24dp"
             android:title="Todas Las Series" />
-
+        <item
+            android:id="@+id/generos"
+            android:icon="@drawable/ic_reorder_black_24dp"
+            android:title="Generos" />
         <item
             android:id="@+id/about"
             android:icon="@drawable/ic_help_black_24dp"

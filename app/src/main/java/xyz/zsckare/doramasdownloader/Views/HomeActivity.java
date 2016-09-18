@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import xyz.zsckare.doramasdownloader.Comun;
 import xyz.zsckare.doramasdownloader.Helpers.DoramasAdapter;
+import xyz.zsckare.doramasdownloader.Models.GenereModel;
 import xyz.zsckare.doramasdownloader.Models.IframeLink;
 import xyz.zsckare.doramasdownloader.R;
 
@@ -56,7 +57,7 @@ public class HomeActivity extends AppCompatActivity
     public static LinkedList<String> list_chapters_name = new LinkedList();
     static LinkedList<String>list_chapters_urls = new LinkedList();
     public static LinkedList<String>list_img_urls = new LinkedList();
-
+    String TAG = "TAG";
     static ListView listViewChapters;
     MaterialDialog progressDialog, progressInicio;
     MaterialDialog.Builder builder;
@@ -170,6 +171,10 @@ public class HomeActivity extends AppCompatActivity
             Intent intent = new Intent(HomeActivity.this,LastSeriesActivity.class);
             startActivity(intent);
         }
+        if (id == R.id.generos){
+            Intent intent = new Intent(HomeActivity.this,GeneresActivity.class);
+            startActivity(intent);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -194,6 +199,8 @@ public class HomeActivity extends AppCompatActivity
                     Elements links = doc.select("div.thumb-cap");
                     Elements links_text = doc.select("div.thumb-cap > strong > a");
                     Elements images = doc.select("div.thumb-cap > a > img");
+                    Elements generes = doc.select("div#genuno > ul.alfa > li > a");
+                    Log.d("TAG", "run: ---->"+generes.size());
                     //Log.d("size",""+images.size());
                     //Log.d("size",""+links_text.size());
 
@@ -205,6 +212,17 @@ public class HomeActivity extends AppCompatActivity
                         list_chapters_urls.add(links_text.get(i).attr("href"));
                         list_img_urls.add(images.get(i).attr("src"));
                     }
+
+                    if (Comun.list_generes.isEmpty()){
+                        for (Element genere:generes) {
+                            Log.d("TAG", "run: --->"+genere.text()+"---"+genere.attr("href"));
+                            GenereModel genereModel = new GenereModel(genere.text(),genere.attr("href"));
+                            Log.d(TAG, "run: "+genereModel.toString());
+
+                            Comun.list_generes.add(genereModel);
+                        }
+                    }
+
 
                     fillList();
 
