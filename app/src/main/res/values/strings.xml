@@ -4,6 +4,7 @@
     <string name="wait">Espere por Favor</string>
     <string name="download">Descargar</string>
     <string name="loading_series">Cargando Series</string>
+    <string name="load_serie">Cargando Serie</string>
     <string name="error">Ha ocurrido un error</string>
     <string name="error_text">Esto puede pasar si no tienes internet o ha ocurrido un error en el servidor</string>
     <string name="load_again">Cargar de Nuevo</string>

@@ -3,6 +3,7 @@ package xyz.zsckare.doramasdownloader.Views;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.NetworkOnMainThreadException;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,9 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +39,8 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
     GridView gridView;
     LinearLayout pagination;
     LinkedList<PageModel>pageArr = new LinkedList();
-
+    MaterialDialog progressDialog, progressInicio;
+    MaterialDialog.Builder builder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +49,12 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
         gridView = (GridView) findViewById(R.id.gridViewDoramas);
         pagination = (LinearLayout) findViewById(R.id.paginationContainer);
 
+        MaterialDialog.Builder builderInicio = new MaterialDialog.Builder(this)
+                .content(R.string.loading_series)
+                .title(R.string.wait)
+                .progress(true, 0);
+
+        progressInicio = builderInicio.build();
 
         try {
             getLastChapters(main_url);
@@ -59,7 +70,7 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
 
             Intent intent = new Intent(LastSeriesActivity.this,DoramaActivity.class);
             startActivity(intent);
-            Toast.makeText(LastSeriesActivity.this, Comun.list_doramas_thumbs.get(position).toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(LastSeriesActivity.this, Comun.list_doramas_thumbs.get(position).toString(), Toast.LENGTH_SHORT).show();
         }
     });
 
@@ -139,7 +150,7 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
 
 
     private void getLastChapters(final String my_url) throws IOException, NetworkOnMainThreadException {
-
+        progressInicio.show();
         //Log.d("------>","<-----");
         Thread thread = new Thread(new Runnable()
         {
@@ -172,6 +183,21 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
                 }
                 catch (Exception e)
                 {
+                    new MaterialDialog.Builder(LastSeriesActivity.this)
+                            .title(R.string.error)
+                            .content(R.string.error_text)
+                            .positiveText(R.string.load_again)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    try {
+                                        getLastChapters(my_url);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            })
+                            .show();
                     e.printStackTrace();
                 }
             }
@@ -189,6 +215,7 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
             public void run() {
 
                 gridView.setAdapter(adapter);
+                progressInicio.dismiss();
             }
         });
     }
