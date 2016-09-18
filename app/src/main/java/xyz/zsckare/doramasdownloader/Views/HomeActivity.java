@@ -166,8 +166,9 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.series) {
+            Intent intent = new Intent(HomeActivity.this,LastSeriesActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -178,7 +179,7 @@ public class HomeActivity extends AppCompatActivity
 
     private void getLastChapters() throws IOException, NetworkOnMainThreadException {
         progressInicio.show();
-        Log.d("------>","<-----");
+        //Log.d("------>","<-----");
         Thread thread = new Thread(new Runnable()
         {
             @Override
@@ -193,13 +194,13 @@ public class HomeActivity extends AppCompatActivity
                     Elements links = doc.select("div.thumb-cap");
                     Elements links_text = doc.select("div.thumb-cap > strong > a");
                     Elements images = doc.select("div.thumb-cap > a > img");
-                    Log.d("size",""+images.size());
-                    Log.d("size",""+links_text.size());
+                    //Log.d("size",""+images.size());
+                    //Log.d("size",""+links_text.size());
 
                     for (int i = 0; i <links_text.size() ; i++) {
-                        Log.d("text",links_text.get(i).text());
-                        Log.d("href",links_text.get(i).attr("href"));
-                        Log.d("img","--->"+images.get(i).attr("src"));
+                        //Log.d("text",links_text.get(i).text());
+                        //Log.d("href",links_text.get(i).attr("href"));
+                        //Log.d("img","--->"+images.get(i).attr("src"));
                         list_chapters_name.add(links_text.get(i).text());
                         list_chapters_urls.add(links_text.get(i).attr("href"));
                         list_img_urls.add(images.get(i).attr("src"));
@@ -297,7 +298,7 @@ public class HomeActivity extends AppCompatActivity
                         //  System.out.println(" * video:"+ link.attr("src"));
                         IframeLink iframe = new IframeLink(link.attr("src"));
                         if(iframe.getUrl().contains("mundoasia")){
-                            System.out.println("----->"+iframe.getUrl());
+                            //System.out.println("----->"+iframe.getUrl());
                             arrayIframes.add(iframe);
                         }
 
@@ -353,7 +354,7 @@ public class HomeActivity extends AppCompatActivity
                 // System.out.println(text.trim());
                 Matcher m = r.matcher(text);
                 if (m.find( )) {
-                    Log.d("INFO","---->Found value: " +m.group(0) );
+                    //Log.d("INFO","---->Found value: " +m.group(0) );
 
                     processResults(m.group(0));
 
@@ -381,9 +382,9 @@ public class HomeActivity extends AppCompatActivity
 
         }
         if(srcs.size() > 0){
-            Log.d("INFO------->",srcs.get(0));
+            //Log.d("INFO------->",srcs.get(0));
             Comun.main_url = srcs.get(0);
-            Log.d("------------------", "processResults: "+Comun.main_url);
+            //Log.d("------------------", "processResults: "+Comun.main_url);
 
             runOnUiThread(new Runnable() {
                 @Override
