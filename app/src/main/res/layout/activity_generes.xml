@@ -23,5 +23,29 @@
                 android:layout_height="match_parent"
                 android:id="@+id/layoutGeneres"></LinearLayout>
         </HorizontalScrollView>
+
+        <GridView
+            android:id="@+id/gridViewDoramas"
+            android:layout_width="match_parent"
+            android:layout_height="485dp"
+            android:columnWidth="120dp"
+            android:horizontalSpacing="@dimen/espacio_grilla"
+            android:numColumns="auto_fit"
+            android:padding="@dimen/espacio_grilla"
+            android:verticalSpacing="@dimen/espacio_grilla" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/horizontalScrollView" >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/paginationContainer"></LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
+
+
 </RelativeLayout>
