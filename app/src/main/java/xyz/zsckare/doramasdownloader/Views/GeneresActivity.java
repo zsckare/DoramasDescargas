@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.NetworkOnMainThreadException;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,11 +41,45 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
     String TAG = "TAG";
     LinkedList<PageModel> pageArr = new LinkedList();
     LinkedList<Button> btnArr = new LinkedList();
-
+    TabLayout tabs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generes);
+
+        tabs= (TabLayout) findViewById(R.id.tabs);
+        tabs.setBackgroundColor(Color.rgb(48,63,159));
+        tabs.setTabTextColors(Color.GRAY,Color.WHITE);
+        tabs.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tabs.setOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        Log.d(TAG, "onTabSelected: "+tab.getText());
+                        for (GenereModel genere:Comun.list_generes) {
+                            if (genere.getName().compareToIgnoreCase(tab.getText().toString())==0){
+                                Toast.makeText(GeneresActivity.this, genere.getUrl(), Toast.LENGTH_SHORT).show();
+                                try {
+                                    getPages(genere.getUrl());
+                                    getLastChapters(genere.getUrl());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        // ...
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        // ...
+                    }
+                }
+        );
         gridView = (GridView) findViewById(R.id.gridViewDoramas);
         pagination = (LinearLayout) findViewById(R.id.paginationContainer);
         layoutGeneres = (LinearLayout)findViewById(R.id.layoutGeneres);
@@ -66,7 +101,8 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
         int j = 11;
         int i = 22;
         for (GenereModel genere: Comun.list_generes) {
-            Button btnTag = new Button(GeneresActivity.this);
+            tabs.addTab(tabs.newTab().setText(genere.getName()));
+            /*Button btnTag = new Button(GeneresActivity.this);
             btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             btnTag.setText(genere.getName());
             btnTag.setBackgroundColor(Color.rgb(48,63,159));
@@ -75,7 +111,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
             btnTag.setOnClickListener(GeneresActivity.this);
             layoutGeneres.addView(btnTag);
             j++;
-            i++;
+            i++;*/
         }
     }
 
