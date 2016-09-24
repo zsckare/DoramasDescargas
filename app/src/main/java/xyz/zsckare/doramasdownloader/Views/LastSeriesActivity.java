@@ -67,7 +67,7 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             DoramaActivity.postion = position;
-
+            DoramaActivity.full_info = 0;
             Intent intent = new Intent(LastSeriesActivity.this,DoramaActivity.class);
             startActivity(intent);
             //Toast.makeText(LastSeriesActivity.this, Comun.list_doramas_thumbs.get(position).toString(), Toast.LENGTH_SHORT).show();

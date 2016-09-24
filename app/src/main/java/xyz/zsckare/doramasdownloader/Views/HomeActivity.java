@@ -164,8 +164,6 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -185,11 +183,15 @@ public class HomeActivity extends AppCompatActivity
             Intent intent = new Intent(HomeActivity.this,AboutActivity.class);
             startActivity(intent);
         }
+
+        if (id == R.id.az){
+            Intent intent = new Intent(HomeActivity.this,AllSeriesActivity.class);
+            startActivity(intent);
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
     private void getLastChapters() throws IOException, NetworkOnMainThreadException {
         progressInicio.show();
@@ -203,12 +205,14 @@ public class HomeActivity extends AppCompatActivity
                 {
                     Log.d("Fetching %s...", main_url);
 
-
                     Document doc = Jsoup.connect(main_url).userAgent("Mozilla").timeout(5000).get();
                     Elements links = doc.select("div.thumb-cap");
                     Elements links_text = doc.select("div.thumb-cap > strong > a");
                     Elements images = doc.select("div.thumb-cap > a > img");
                     Elements generes = doc.select("div#genuno > ul.alfa > li > a");
+
+                    Elements az_list = doc.select("ul#dramaslist > li > a");
+                    Log.d(TAG, "run: az"+az_list.size());
                     Log.d("TAG", "run: ---->"+generes.size());
                     //Log.d("size",""+images.size());
                     //Log.d("size",""+links_text.size());
@@ -222,6 +226,8 @@ public class HomeActivity extends AppCompatActivity
                         list_img_urls.add(images.get(i).attr("src"));
                     }
 
+
+
                     if (Comun.list_generes.isEmpty()){
                         for (Element genere:generes) {
                             Log.d("TAG", "run: --->"+genere.text()+"---"+genere.attr("href"));
@@ -232,6 +238,11 @@ public class HomeActivity extends AppCompatActivity
                         }
                     }
 
+                    for (Element serie:az_list) {
+                        //Log.d(TAG, "run: --->"+serie.text());
+                        AllSeriesActivity.az_names.add(serie.text());
+                        AllSeriesActivity.az_urls.add(serie.attr("href"));
+                    }
 
                     fillList();
 
@@ -248,7 +259,6 @@ public class HomeActivity extends AppCompatActivity
 
         thread.start();
     }
-
 
     private void showErr(){
 
@@ -277,8 +287,6 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-
-
     private void fillList(){
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, list_chapters_name);
@@ -298,11 +306,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-
-
     //------- trae informacion del capitulo y procesa para dejar listo para descargar
-
-
 
     public  void getInfo(final String chapter_url){
         Thread thread = new Thread(new Runnable()
@@ -350,7 +354,6 @@ public class HomeActivity extends AppCompatActivity
     }
     public static LinkedList<IframeLink> arrayIframes = new LinkedList();
     static String title = "";
-
 
     private  void getIframeslinks() throws IOException{
         IframeLink link;
@@ -458,7 +461,6 @@ public class HomeActivity extends AppCompatActivity
         }
 
     }
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

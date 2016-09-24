@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,24 +47,33 @@ public class DoramaActivity extends AppCompatActivity {
     public static int postion = 0;
     static String name = "";
     static String TAG = "DoramaActivity";
+
+    public static int full_info = 0;
     ImageView portadaDorama;
+    TextView sinopsisTextView;
     DoramaThumbModel dorama;
     LinkedList<String> textLink = new LinkedList();
     LinkedList<String> hreflink = new LinkedList();
     ListView listChapters;
+    TextView titleDorama;
     MaterialDialog progressInicio;
-
+    String full_card_text = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dorama);
-        TextView titleDorama = (TextView)findViewById(R.id.title_dorama);
+        titleDorama= (TextView)findViewById(R.id.title_dorama);
+        sinopsisTextView = (TextView)findViewById(R.id.sinopsis_text_view);
         listChapters = (ListView)findViewById(R.id.listChapters);
-        dorama = Comun.list_doramas_thumbs.get(postion);
-        dorama_url = dorama.getUrl();
+        if (full_info==0){
+            dorama = Comun.list_doramas_thumbs.get(postion);
+
+            dorama_url = dorama.getUrl();
+            titleDorama.setText(dorama.getName());
+        }
         portadaDorama = (ImageView)findViewById(R.id.img_Dorama);
 
-        titleDorama.setText(dorama.getName());
+
 
         MaterialDialog.Builder builderInicio = new MaterialDialog.Builder(this)
                 .content(R.string.load_serie)
@@ -71,7 +82,9 @@ public class DoramaActivity extends AppCompatActivity {
 
         progressInicio = builderInicio.build();
 
-        Picasso.with(getApplicationContext()).load(dorama.getImg()).into(portadaDorama);
+        if (full_info==0){
+            Picasso.with(getApplicationContext()).load(dorama.getImg()).into(portadaDorama);
+        }
         getChapters();
 
 
@@ -97,16 +110,44 @@ public class DoramaActivity extends AppCompatActivity {
                     Log.d("Fetching Pages %s...", dorama_url);
 
                     Document doc = Jsoup.connect(dorama_url).userAgent("Mozilla").timeout(5000).get();
+                    final String img = doc.select("div.font > img").first().attr("src");
+
+                    //Log.d(TAG, "run: "+img);
+                    final String titulo  = doc.select("h1.titulo").text();
+                    if (full_info!=0){
+                        runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+
+                                              titleDorama.setText(titulo);
+                                          }
+                                      });
+                        Handler uiHandler = new Handler(Looper.getMainLooper());
+                        uiHandler.post(new Runnable(){
+                            @Override
+                            public void run() {
+                                Picasso.with(getApplicationContext()).load(img).into(portadaDorama);
+                            }
+                        });
+
+                    }
                     Elements chapters = doc.select("ul.lcp_catlist > li > a");
-                    Log.d(TAG,"size------>"+chapters.size());
+
+                    Elements descriptions = doc.select("div.font");
+                    Log.d(TAG,"size------>"+descriptions.size());
 
                     for (int i = 0; i < (chapters.size()-1); i++) {
-                        Log.d(TAG, "run: --->"+chapters.get(i).text());
+                        //Log.d(TAG, "run: --->"+chapters.get(i).text());
                         textLink.add(chapters.get(i).text());
-                        Log.d(TAG, "run: ---->"+chapters.get(i).attr("href"));
+                        //Log.d(TAG, "run: ---->"+chapters.get(i).attr("href"));
                         hreflink.add(chapters.get(i).attr("href"));
                     }
-                    
+
+                    for (Element desc: descriptions) {
+                       // Log.d(TAG, "run: ---------------->"+desc.text());
+                        full_card_text = desc.text();
+                    }
+                    processText(full_card_text);
                     fillList();
 
                 }
@@ -118,6 +159,21 @@ public class DoramaActivity extends AppCompatActivity {
         });
 
         thread.start();
+    }
+
+    private void processText(String text_to_process) {
+
+        final String splited[] = text_to_process.split("Sinopsis:");
+
+        Log.d(TAG, "processText: --->"+splited[1]);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+        sinopsisTextView.setText(splited[1]);
+
+            }
+        });
+
     }
 
     private void fillList() {
@@ -151,7 +207,7 @@ public class DoramaActivity extends AppCompatActivity {
                     Log.d("Fetching %s...", chapter_url);
 
 
-                    Document doc = Jsoup.connect(chapter_url).userAgent("Mozilla").timeout(5000).get();
+                    Document doc = Jsoup.connect(chapter_url).userAgent("Mozilla").timeout(10000).get();
                     Elements links = doc.select("iframe");
                     Elements titles = doc.select("title");
                     //System.out.println("\nVideos: (%d)"+ links.size());
@@ -174,7 +230,24 @@ public class DoramaActivity extends AppCompatActivity {
                     //System.out.println(doc);
                 }
                 catch (Exception e)
-                {
+                { runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        progressInicio.dismiss();
+                        new MaterialDialog.Builder(DoramaActivity.this)
+                                .title(R.string.error)
+                                .content(R.string.error_text)
+                                .positiveText(R.string.load_again)
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        getInfo(chapter_url);
+                                    }
+                                })
+                                .show();
+                    }
+                });
                     e.printStackTrace();
                 }
             }

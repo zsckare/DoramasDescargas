@@ -1,8 +1,6 @@
 package xyz.zsckare.doramasdownloader.Models;
 
-/**
- * Created by katty on 18/09/16.
- */
+
 public class GenereModel {
     String name, url;
 

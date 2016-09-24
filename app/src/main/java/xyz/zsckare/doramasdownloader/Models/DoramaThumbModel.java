@@ -1,8 +1,6 @@
 package xyz.zsckare.doramasdownloader.Models;
 
-/**
- * Created by katty on 17/09/16.
- */
+
 public class DoramaThumbModel {
     String name, img, url;
 

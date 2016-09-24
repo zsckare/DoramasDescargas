@@ -30,7 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Views.GeneresActivity" />
-        <activity android:name=".Views.AboutActivity"></activity>
+        <activity android:name=".Views.AboutActivity" />
+        <activity android:name=".Views.AllSeriesActivity"></activity>
     </application>
 
 </manifest>
