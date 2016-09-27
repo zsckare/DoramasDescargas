@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import xyz.zsckare.doramasdownloader.Views.HomeActivity;
 
 
 public class DoramaGridAdapter  extends ArrayAdapter<DoramaThumbModel> {
+    String TAG = getClass().getName()+"";
     public DoramaGridAdapter(Context context, LinkedList<DoramaThumbModel> objects) {
         super(context, 0, objects);
     }
@@ -48,7 +50,17 @@ public class DoramaGridAdapter  extends ArrayAdapter<DoramaThumbModel> {
             String title = Comun.list_doramas_thumbs.get(position).getName();
             //Log.d("Adapter", "getView: --"+title+"----"+img);
             // Setup.
-            Picasso.with(getContext()).load(img).into(avatar);
+            Picasso.with(getContext()).load(img).error(R.drawable.logo_doramas).into(avatar, new Callback() {
+                @Override
+                public void onSuccess() {
+                    Log.d(TAG, "onSuccess: Picasso");
+                }
+
+                @Override
+                public void onError() {
+                    Log.d(TAG, "onError: Picasso");
+                }
+            });
             // Glide.with(getContext()).load(lead.getImage()).into(avatar);
             name.setText(title);
         }

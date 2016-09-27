@@ -41,7 +41,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
     String TAG = "TAG";
     LinkedList<PageModel> pageArr = new LinkedList();
     LinkedList<Button> btnArr = new LinkedList();
-    TabLayout tabs;
+    TabLayout tabs, tabPages;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +56,13 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         Log.d(TAG, "onTabSelected: "+tab.getText());
+
+                        if (!pageArr.isEmpty()){
+                            tabPages.removeAllTabs();
+                        }
+
                         for (GenereModel genere:Comun.list_generes) {
                             if (genere.getName().compareToIgnoreCase(tab.getText().toString())==0){
-                                Toast.makeText(GeneresActivity.this, genere.getUrl(), Toast.LENGTH_SHORT).show();
                                 try {
                                     getPages(genere.getUrl());
                                     getLastChapters(genere.getUrl());
@@ -76,7 +80,68 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onTabReselected(TabLayout.Tab tab) {
+
+                    }
+                }
+        );
+
+
+        tabPages = (TabLayout)findViewById(R.id.tab_pages);
+        tabPages.setBackgroundColor(Color.rgb(48,63,159));
+        tabPages.setTabTextColors(Color.GRAY,Color.WHITE);
+        tabPages.setTabMode(TabLayout.MODE_SCROLLABLE);
+
+        tabPages.setOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+
+                        if (tab.getText().toString().compareToIgnoreCase("1")==0){
+
+                        }else {
+                            for (PageModel pagina : pageArr){
+                                if (pagina.getName().compareToIgnoreCase(tab.getText().toString())==0){
+                                    Toast.makeText(GeneresActivity.this, "Cargando pagina", Toast.LENGTH_SHORT).show();
+                                    String pagna = tab.getText().toString();
+                                    Comun.list_doramas_thumbs.clear();
+                                    gridView.setAdapter(null);
+                                    for (PageModel page: pageArr) {
+                                        if(!(tab.getText().toString().compareToIgnoreCase("1") ==0)){
+
+                                            if (page.getName().compareToIgnoreCase(pagna)==0){
+                                                Toast.makeText(GeneresActivity.this, page.getUrl(), Toast.LENGTH_SHORT).show();
+                                                try {
+
+                                                    getLastChapters(page.getUrl());
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }else{
+                                            try {
+
+                                                getLastChapters(page.getUrl());
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Log.d(TAG, "onTabSelected: " + tab.getText());
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
                         // ...
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        if (tab.getText().toString().compareToIgnoreCase("1")==0){
+                            Log.d(TAG, "onTabReselected: "+tab.getText());
+                        }
                     }
                 }
         );
@@ -98,20 +163,10 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void fillGeneres() {
-        int j = 11;
-        int i = 22;
+
         for (GenereModel genere: Comun.list_generes) {
             tabs.addTab(tabs.newTab().setText(genere.getName()));
-            /*Button btnTag = new Button(GeneresActivity.this);
-            btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            btnTag.setText(genere.getName());
-            btnTag.setBackgroundColor(Color.rgb(48,63,159));
-            btnTag.setTextColor(Color.WHITE);
-            btnTag.setId(j + 1 + (i * 4));
-            btnTag.setOnClickListener(GeneresActivity.this);
-            layoutGeneres.addView(btnTag);
-            j++;
-            i++;*/
+
         }
     }
 
@@ -135,7 +190,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
 
         for (PageModel pagina : pageArr){
             if (pagina.getName().compareToIgnoreCase(btn.getText().toString())==0){
-                Toast.makeText(GeneresActivity.this, "es una pagina", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GeneresActivity.this, "Cargando pagina", Toast.LENGTH_SHORT).show();
                 String pagna = btn.getText().toString();
                 Comun.list_doramas_thumbs.clear();
                 gridView.setAdapter(null);
@@ -257,6 +312,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                     // Log.d(TAG,"size------>"+pages.size());
                     if (!pageArr.isEmpty()){
                         pageArr.clear();
+                        tabPages.removeAllTabs();
                     }
                     for (Element page:pages) {
 
@@ -299,7 +355,13 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
             btnArr.add(btn);
             j++;
             i++;
-            for (PageModel page :pageArr) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    tabPages.addTab(tabPages.newTab().setText("1"));
+                }
+            });
+            for (final PageModel page :pageArr) {
 
                 Button btnTag = new Button(GeneresActivity.this);
                 btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -311,6 +373,13 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                 btnArr.add(btnTag);
                 j++;
                 i++;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tabPages.addTab(tabPages.newTab().setText(page.getName()));
+                    }
+                });
+
             }
         }
     }
@@ -319,6 +388,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
     private void clearPagination(){
 
         if (!btnArr.isEmpty()){
+            tabPages.removeAllTabs();
             for (Button btn :btnArr) {
                 pagination.removeAllViews();
             }
@@ -335,7 +405,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                     pagination.removeAllViews();
                 }
                 for (Button btn :btnArr) {
-                    pagination.addView(btn);
+                   // pagination.addView(btn);
                 }
 
             }

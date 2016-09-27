@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -91,7 +92,6 @@ public class DoramaActivity extends AppCompatActivity {
         listChapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                //Toast.makeText(DoramaActivity.this, hreflink.get(position), Toast.LENGTH_SHORT).show();
                 name = textLink.get(position);
                 getInfo(hreflink.get(position));
             }
@@ -116,17 +116,26 @@ public class DoramaActivity extends AppCompatActivity {
                     final String titulo  = doc.select("h1.titulo").text();
                     if (full_info!=0){
                         runOnUiThread(new Runnable() {
-                                          @Override
-                                          public void run() {
-
-                                              titleDorama.setText(titulo);
-                                          }
-                                      });
+                            @Override
+                            public void run() {
+                                titleDorama.setText(titulo);
+                            }
+                        });
                         Handler uiHandler = new Handler(Looper.getMainLooper());
                         uiHandler.post(new Runnable(){
                             @Override
                             public void run() {
-                                Picasso.with(getApplicationContext()).load(img).into(portadaDorama);
+                                Picasso.with(getApplicationContext()).load(img).error(R.drawable.logo_doramas).into(portadaDorama, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(TAG, "onSuccess: Picasso");
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.d(TAG, "onError: Picasso");
+                                    }
+                                });
                             }
                         });
 
@@ -137,14 +146,11 @@ public class DoramaActivity extends AppCompatActivity {
                     Log.d(TAG,"size------>"+descriptions.size());
 
                     for (int i = 0; i < (chapters.size()-1); i++) {
-                        //Log.d(TAG, "run: --->"+chapters.get(i).text());
                         textLink.add(chapters.get(i).text());
-                        //Log.d(TAG, "run: ---->"+chapters.get(i).attr("href"));
                         hreflink.add(chapters.get(i).attr("href"));
                     }
 
                     for (Element desc: descriptions) {
-                       // Log.d(TAG, "run: ---------------->"+desc.text());
                         full_card_text = desc.text();
                     }
                     processText(full_card_text);
@@ -202,17 +208,12 @@ public class DoramaActivity extends AppCompatActivity {
             {
                 try
                 {
-                    //Your code goes here
-
                     Log.d("Fetching %s...", chapter_url);
-
 
                     Document doc = Jsoup.connect(chapter_url).userAgent("Mozilla").timeout(10000).get();
                     Elements links = doc.select("iframe");
                     Elements titles = doc.select("title");
-                    //System.out.println("\nVideos: (%d)"+ links.size());
                     for (Element link : links) {
-                        //  System.out.println(" * video:"+ link.attr("src"));
                         IframeLink iframe = new IframeLink(link.attr("src"));
                         if(iframe.getUrl().contains("mundoasia")){
                             System.out.println("----->"+iframe.getUrl());
@@ -227,7 +228,6 @@ public class DoramaActivity extends AppCompatActivity {
                     }
 
                     getIframeslinks();
-                    //System.out.println(doc);
                 }
                 catch (Exception e)
                 { runOnUiThread(new Runnable() {
@@ -261,10 +261,7 @@ public class DoramaActivity extends AppCompatActivity {
 
     private  void getIframeslinks() throws IOException {
         IframeLink link;
-        //System.out.println(arrayIframes.size());
         for(IframeLink iframe:  arrayIframes){
-            //System.out.println("Clases.MainWindow.getIframeslinks()");
-            //  System.out.println(iframe.getUrl());
             moreInfo(iframe.getUrl());
         }
 
@@ -273,27 +270,22 @@ public class DoramaActivity extends AppCompatActivity {
     private void moreInfo(String frame_url) throws IOException{
         Document doc = Jsoup.connect(frame_url).userAgent("Mozilla").timeout(10000).get();
         Elements links = doc.select("script[type]");
-        //System.out.println(links);
 
         String pattern = "\\[(.*?)\\]";
 
-        // Create a Pattern object
         Pattern r = Pattern.compile(pattern);
 
         // Now create matcher object.
         for(Element link: links){
             String text = link+"";
             if(text.contains("jwplayer('embed').setup({")){
-                //JOptionPane.showMessageDialog(null, text.trim());
-                // System.out.println(text.trim());
                 Matcher m = r.matcher(text);
                 if (m.find( )) {
                     Log.d("INFO","---->Found value: " +m.group(0) );
 
                     processResults(m.group(0));
-
-                    //JOptionPane.showMessageDialog(null, m.group(0));
                 }else {
+                    Log.d(TAG, "moreInfo: error no encontrado");
                     // System.out.println("NO MATCH");
                 }
             }
@@ -344,14 +336,12 @@ public class DoramaActivity extends AppCompatActivity {
                                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Comun.main_url));
                                     request.setDescription("Descargando capitulo");
                                     request.setTitle(title);
-// in order for this if to run, you must use the android 3.2 to compile your app
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                                         request.allowScanningByMediaScanner();
                                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                     }
                                     request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
-
-// get download service and enqueue file
+                                    
                                     DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                     manager.enqueue(request);
 

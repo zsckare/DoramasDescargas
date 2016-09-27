@@ -10,6 +10,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
@@ -31,7 +32,12 @@
         </activity>
         <activity android:name=".Views.GeneresActivity" />
         <activity android:name=".Views.AboutActivity" />
-        <activity android:name=".Views.AllSeriesActivity"></activity>
+        <activity android:name=".Views.AllSeriesActivity" />
+
+        <service
+            android:name=".Helpers.NewChaptersService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

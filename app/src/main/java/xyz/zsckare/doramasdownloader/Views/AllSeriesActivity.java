@@ -29,7 +29,7 @@ import xyz.zsckare.doramasdownloader.R;
 
 public class AllSeriesActivity extends AppCompatActivity {
 
-    String TAG = "----";
+    String TAG = getClass().getSimpleName();
     public static LinkedList<String>az_names = new LinkedList<>();
     public static LinkedList<String>az_urls = new LinkedList<>();
 RecyclerView recyclerView;

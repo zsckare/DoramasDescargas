@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
 
 import xyz.zsckare.doramasdownloader.Comun;
 import xyz.zsckare.doramasdownloader.Helpers.DoramasAdapter;
+import xyz.zsckare.doramasdownloader.Helpers.NewChaptersService;
 import xyz.zsckare.doramasdownloader.Models.GenereModel;
 import xyz.zsckare.doramasdownloader.Models.IframeLink;
 import xyz.zsckare.doramasdownloader.R;
@@ -64,6 +65,10 @@ public class HomeActivity extends AppCompatActivity
     MaterialDialog progressDialog, progressInicio;
     MaterialDialog.Builder builder;
     DrawerLayout drawer;
+
+    Intent serviceNotifictions;
+
+    public static int firstTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,7 +230,7 @@ public class HomeActivity extends AppCompatActivity
                         list_chapters_urls.add(links_text.get(i).attr("href"));
                         list_img_urls.add(images.get(i).attr("src"));
                     }
-
+                    NewChaptersService.old_chapters = list_chapters_name;
 
 
                     if (Comun.list_generes.isEmpty()){
@@ -244,6 +249,11 @@ public class HomeActivity extends AppCompatActivity
                         AllSeriesActivity.az_urls.add(serie.attr("href"));
                     }
 
+                    if (firstTime == 0){
+                        serviceNotifictions = new Intent(HomeActivity.this,NewChaptersService.class);
+                        startService(serviceNotifictions);
+
+                    }
                     fillList();
 
 

@@ -1,6 +1,7 @@
 package xyz.zsckare.doramasdownloader.Helpers;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.LinkedList;
@@ -19,6 +21,7 @@ import xyz.zsckare.doramasdownloader.Views.HomeActivity;
 
 
 public class DoramasAdapter  extends ArrayAdapter<String> {
+    String TAG = getClass().getName();
     public DoramasAdapter(Context context, LinkedList<String> objects) {
         super(context, 0, objects);
     }
@@ -46,7 +49,17 @@ public class DoramasAdapter  extends ArrayAdapter<String> {
         String img = HomeActivity.list_img_urls.get(position);
         String title = HomeActivity.list_chapters_name.get(position);
         // Setup.
-        Picasso.with(getContext()).load(img).into(avatar);
+        Picasso.with(getContext()).load(img).error(R.drawable.logo_doramas).into(avatar, new Callback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "onSuccess: Picasso");
+            }
+
+            @Override
+            public void onError() {
+                Log.d(TAG, "onError: Picasso");
+            }
+        });
        // Glide.with(getContext()).load(lead.getImage()).into(avatar);
         name.setText(title);
 
