@@ -193,6 +193,7 @@ public class DoramaActivity extends AppCompatActivity {
 
                 listChapters.setAdapter(adapter);
                 progressInicio.dismiss();
+                Toast.makeText(getApplicationContext(), "Visita estrenosdoramas.org/", Toast.LENGTH_SHORT).show();
 
             }
         });

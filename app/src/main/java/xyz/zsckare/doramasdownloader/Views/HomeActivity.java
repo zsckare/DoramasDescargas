@@ -351,6 +351,7 @@ public class HomeActivity extends AppCompatActivity
                 }
                 listViewChapters.setAdapter(mLeadsAdapter);
                 progressInicio.dismiss();
+                Toast.makeText(getApplicationContext(), "Visita estrenosdoramas.org/", Toast.LENGTH_SHORT).show();
             }
         });
 

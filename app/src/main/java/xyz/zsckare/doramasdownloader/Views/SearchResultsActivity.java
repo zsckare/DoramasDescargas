@@ -85,6 +85,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
                 result.setAdapter(null);
                 result.setAdapter(adapter);
+                Toast.makeText(getApplicationContext(), "Visita estrenosdoramas.org/", Toast.LENGTH_SHORT).show();
             }
         });
 

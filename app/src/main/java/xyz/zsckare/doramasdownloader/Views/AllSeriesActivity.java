@@ -47,6 +47,8 @@ RecyclerView recyclerView;
         //has to be called AFTER RecyclerView.setAdapter()
         fastScroller.setRecyclerView(recyclerView);
 
+        Toast.makeText(getApplicationContext(), "Visita estrenosdoramas.org/", Toast.LENGTH_SHORT).show();
+
     }
 
 
