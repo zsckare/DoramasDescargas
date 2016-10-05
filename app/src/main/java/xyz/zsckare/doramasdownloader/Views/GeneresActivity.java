@@ -42,14 +42,16 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
     LinkedList<PageModel> pageArr = new LinkedList();
     LinkedList<Button> btnArr = new LinkedList();
     TabLayout tabs, tabPages;
+
+    static String uriGenero = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generes);
 
         tabs= (TabLayout) findViewById(R.id.tabs);
-        tabs.setBackgroundColor(Color.rgb(48,63,159));
-        tabs.setTabTextColors(Color.GRAY,Color.WHITE);
+        tabs.setBackgroundColor(Comun.comunColor);
+        tabs.setTabTextColors(R.color.secundaryText,Color.WHITE);
         tabs.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabs.setOnTabSelectedListener(
                 new TabLayout.OnTabSelectedListener() {
@@ -64,6 +66,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                         for (GenereModel genere:Comun.list_generes) {
                             if (genere.getName().compareToIgnoreCase(tab.getText().toString())==0){
                                 try {
+                                    uriGenero = genere.getUrl();
                                     getPages(genere.getUrl());
                                     getLastChapters(genere.getUrl());
                                 } catch (IOException e) {
@@ -87,7 +90,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
 
 
         tabPages = (TabLayout)findViewById(R.id.tab_pages);
-        tabPages.setBackgroundColor(Color.rgb(48,63,159));
+        tabPages.setBackgroundColor(Comun.comunColor);
         tabPages.setTabTextColors(Color.GRAY,Color.WHITE);
         tabPages.setTabMode(TabLayout.MODE_SCROLLABLE);
 
@@ -120,7 +123,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                                         }else{
                                             try {
 
-                                                getLastChapters(page.getUrl());
+                                                getLastChapters(uriGenero);
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
@@ -140,6 +143,7 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onTabReselected(TabLayout.Tab tab) {
                         if (tab.getText().toString().compareToIgnoreCase("1")==0){
+
                             Log.d(TAG, "onTabReselected: "+tab.getText());
                         }
                     }
@@ -256,21 +260,28 @@ public class GeneresActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 catch (Exception e)
                 {
-                    new MaterialDialog.Builder(GeneresActivity.this)
-                            .title(R.string.error)
-                            .content(R.string.error_text)
-                            .positiveText(R.string.load_again)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    try {
-                                        getLastChapters(my_url);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            })
-                            .show();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new MaterialDialog.Builder(GeneresActivity.this)
+                                    .title(R.string.error)
+                                    .content(R.string.error_text)
+                                    .positiveText(R.string.load_again)
+                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            try {
+                                                getLastChapters(my_url);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
+
                     e.printStackTrace();
                 }
             }

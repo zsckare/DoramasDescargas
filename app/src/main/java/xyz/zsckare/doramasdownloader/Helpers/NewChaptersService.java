@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -34,17 +35,20 @@ public class NewChaptersService extends Service {
     String TAG = getClass().getSimpleName();
     Context context;
     public NewChaptersService() {
+     //   context =  getApplicationContext();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        context =  getApplicationContext();
+
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
     public void onCreate() {
+
+        context = HomeActivity.mContext;
         HomeActivity.firstTime = 1;
         try {
             getLastChapters();
@@ -53,7 +57,7 @@ public class NewChaptersService extends Service {
         }
         super.onCreate();
     }
-
+    int algo = 0;
     private void checkForNewChapters() {
 
         int size = old_chapters.size();
@@ -61,34 +65,41 @@ public class NewChaptersService extends Service {
         for (int i = 0; i < size; i++) {
             if (old_chapters.get(i).compareToIgnoreCase(new_chapters.get(i))==0){
                 Log.d(TAG, "checkForNewChapters: mismo capitlulo");
+                String message = "Se ha agregado "+new_chapters.get(i);
+
+
             }else{
                 Log.d(TAG, "checkForNewChapters:  Nuevo Capitulo ");
+                if (i==0) {
 
-                String message = "Se ha agregado "+new_chapters.get(i);
-                PugNotification.with(context)
-                        .load()
-                        .title(R.string.new_chapter_title)
-                        .message(R.string.new_chapter_message)
-                        .bigTextStyle(message)
-                        .smallIcon(R.drawable.logo_doramas)
-                        .largeIcon(R.drawable.logo_doramas)
-                        .flags(Notification.DEFAULT_ALL)
-                        .simple()
-                        .build();
-
+                    String message = "Se ha agregado " + new_chapters.get(i);
+                    PugNotification.with(context)
+                            .load()
+                            .title(R.string.new_chapter_title)
+                            .message(R.string.new_chapter_message)
+                            .bigTextStyle(message)
+                            .smallIcon(R.drawable.ic_stat_sinfondo)
+                            .largeIcon(R.drawable.logo_doramas_small)
+                            .flags(Notification.DEFAULT_ALL)
+                            .click(HomeActivity.class)
+                            .simple()
+                            .build();
+                }
 
             }
         }
         old_chapters = new_chapters;
 
+        boolean network = Comun.isNetworkAvailable(context);
 
-        if (Comun.isNetworkAvailable(context)) {
-            android.os.Handler handler = new android.os.Handler();
+        if (network ==true) {
+
+            Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(new Runnable() {
                 public void run() {
                     checkForNewChapters();
                 }
-            }, 5000);
+            }, 600000);
         }
 
     }

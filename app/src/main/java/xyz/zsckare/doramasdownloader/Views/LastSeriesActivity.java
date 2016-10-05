@@ -123,7 +123,7 @@ public class LastSeriesActivity extends AppCompatActivity implements View.OnClic
                 Button btn = new Button(LastSeriesActivity.this);
                 btn.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 btn.setText("1");
-                btn.setBackgroundColor(Color.rgb(48,63,159));
+                btn.setBackgroundColor(Comun.comunColor);
                 btn.setTextColor(Color.WHITE);
                 btn.setId(j + 1 + (i * 4));
                 btn.setOnClickListener(LastSeriesActivity.this);

@@ -320,16 +320,8 @@ public class DoramaActivity extends AppCompatActivity {
                             .title(name)
                             .content("¿Deseas descargar "+name+"?")
                             .positiveText(R.string.download)
-                            .neutralText("Ver Online")
-                            .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                                    Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                                    mediaIntent.setDataAndType(Uri.parse(Comun.main_url), "video/*");
-                                    startActivity(mediaIntent);
-                                }
-                            })
+
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

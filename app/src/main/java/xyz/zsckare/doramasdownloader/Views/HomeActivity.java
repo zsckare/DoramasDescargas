@@ -3,6 +3,7 @@ package xyz.zsckare.doramasdownloader.Views;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.os.NetworkOnMainThreadException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -65,7 +67,7 @@ public class HomeActivity extends AppCompatActivity
     MaterialDialog progressDialog, progressInicio;
     MaterialDialog.Builder builder;
     DrawerLayout drawer;
-
+    public static Context mContext;
     Intent serviceNotifictions;
 
     public static int firstTime = 0;
@@ -84,8 +86,9 @@ public class HomeActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        mContext=getApplicationContext();
 
-
+        Comun.comunColor = Color.rgb(48,63,159);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -169,11 +172,48 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if(id == R.id.search){
+
+
+            new MaterialDialog.Builder(this)
+                    .title("Buscador")
+                    .content("Ingresa el nombre de la serie")
+                    .inputType(InputType.TYPE_CLASS_TEXT )
+                    .input("", null, new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence input) {
+                            searchParams(input.toString());
+                        }
+                    }).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void searchParams(String search){
+
+        SearchResultsActivity.params = search;
+
+        startActivity(new Intent(getApplicationContext(),SearchResultsActivity.class));
+
+
+    }
+
+
+
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+
+
 
         if (id == R.id.series) {
             Intent intent = new Intent(HomeActivity.this,LastSeriesActivity.class);
@@ -230,7 +270,7 @@ public class HomeActivity extends AppCompatActivity
                         list_chapters_urls.add(links_text.get(i).attr("href"));
                         list_img_urls.add(images.get(i).attr("src"));
                     }
-                    NewChaptersService.old_chapters = list_chapters_name;
+                    //NewChaptersService.old_chapters = list_chapters_name;
 
 
                     if (Comun.list_generes.isEmpty()){
@@ -250,8 +290,8 @@ public class HomeActivity extends AppCompatActivity
                     }
 
                     if (firstTime == 0){
-                        serviceNotifictions = new Intent(HomeActivity.this,NewChaptersService.class);
-                        startService(serviceNotifictions);
+                        //serviceNotifictions = new Intent(HomeActivity.this,NewChaptersService.class);
+                        //startService(serviceNotifictions);
 
                     }
                     fillList();
@@ -434,30 +474,21 @@ public class HomeActivity extends AppCompatActivity
                             .title(name)
                             .content("¿Deseas descargar "+name+"?")
                             .positiveText(R.string.download)
-                            .neutralText("Ver Online")
-                            .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                                    Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                                    mediaIntent.setDataAndType(Uri.parse(Comun.main_url), "video/*");
-                                    startActivity(mediaIntent);
-                                }
-                            })
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Comun.main_url));
                                     request.setDescription("Descargando capitulo");
                                     request.setTitle(title);
-// in order for this if to run, you must use the android 3.2 to compile your app
+
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                                         request.allowScanningByMediaScanner();
                                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                     }
                                     request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
 
-// get download service and enqueue file
+
                                     DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                     manager.enqueue(request);
 
@@ -479,5 +510,21 @@ public class HomeActivity extends AppCompatActivity
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+  @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+
+      
+        getMenuInflater().inflate(R.menu.home, menu);
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        //stopService(serviceNotifictions);
+        super.onDestroy();
     }
 }

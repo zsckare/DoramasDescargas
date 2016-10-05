@@ -37,7 +37,9 @@
         <service
             android:name=".Helpers.NewChaptersService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".Views.SearchResultsActivity"></activity>
     </application>
 
 </manifest>
