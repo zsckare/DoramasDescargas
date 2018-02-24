@@ -1,5 +1,6 @@
 package xyz.zsckare.doramasdownloader.Views;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -32,6 +37,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -41,6 +48,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +65,7 @@ public class HomeActivity extends AppCompatActivity
 
     SwipyRefreshLayout mSwipyRefreshLayout;
 
-    static String main_url = "http://estrenosdoramas.org/";
+    static String main_url = "http://estrenosdoramas.net/";
     static String name = "";
     public static LinkedList<String> list_chapters_name = new LinkedList();
     static LinkedList<String>list_chapters_urls = new LinkedList();
@@ -69,8 +77,9 @@ public class HomeActivity extends AppCompatActivity
     DrawerLayout drawer;
     public static Context mContext;
     Intent serviceNotifictions;
-
+    WebView webView;
     public static int firstTime = 0;
+    String fuckingHTML = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +100,7 @@ public class HomeActivity extends AppCompatActivity
         Comun.comunColor = Color.rgb(48,63,159);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        webView = (WebView)findViewById(R.id.webView);
 
         MaterialDialog.Builder builderInicio = new MaterialDialog.Builder(this)
                 .content(R.string.loading_series)
@@ -137,7 +146,7 @@ public class HomeActivity extends AppCompatActivity
                 String url = list_chapters_urls.get(itemPosition);
                 //Toast.makeText(MainActivity.this, "url ==>"+url, Toast.LENGTH_SHORT).show();
                 //Toast.makeText(MainActivity.this, list_img_urls.get(position), Toast.LENGTH_SHORT).show();
-                progressDialog.show();
+                //progressDialog.show();
                 getInfo(url);
 
 
@@ -156,8 +165,157 @@ public class HomeActivity extends AppCompatActivity
 
 
         progressDialog = builder.build();
+
+        //web view configs
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient() {
+            public boolean onConsoleMessage(ConsoleMessage cmsg)
+            {
+                // check secret prefix
+                if (cmsg.message().startsWith("HAACK")){
+                    String msg = cmsg.message().substring(5); // strip off prefix
+
+                    System.out.print("----------------_>");
+                    System.out.print(msg);
+                    fuckingHTML = msg;
+                    reprocessDownload(msg);
+                }
+                if (cmsg.message().startsWith("MAGIC"))
+                {
+                    String msg = cmsg.message().substring(5); // strip off prefix
+
+                    System.out.print("----------------_>");
+                    System.out.print(msg);
+                    fuckingHTML = msg;
+                    //Toast.makeText(HomeActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    //reprocessDownload(msg);
+                    Thread timerThread = new Thread(){
+                        public void run(){
+                            try{
+                                sleep(5000);
+                            }catch(InterruptedException e){
+                                e.printStackTrace();
+                            }finally{
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        webView.loadUrl("javascript:console.log('HAACK'+document.getElementsByTagName('html')[0].innerHTML);");
+                                    }
+                                });
+
+//                        overridePendingTransition(R.anim.left_in,R.anim.left_out);
+
+
+                            }
+                        }
+                    };
+                    timerThread.start();
+            /* process HTML */
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                System.out.print("Cargo la puta pagina");
+                Toast.makeText(HomeActivity.this, "Ya cargo", Toast.LENGTH_SHORT).show();
+                view.loadUrl("javascript:console.log('MAGIC'+document.getElementsByTagName('html')[0].innerHTML);");
+            }
+        });
+
+        //permisos
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+               // Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                //Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+
+        };
+        TedPermission.with(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("Si rechazas estos permisos la aplicacion o funcionara correctamente y tendras que activarlos manualmente")
+                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET)
+                .check();
     }
 
+    private void reprocessDownload(String html) {
+        Toast.makeText(this, "descarga", Toast.LENGTH_SHORT).show();
+        Document doc = Jsoup.parse(html);
+        //jw-media jw-reset
+        Log.d(TAG, "reprocessDownload: "+html);
+        System.out.println(html);
+        Elements video = doc.select("video.jw-video");
+        String src = "";
+        for (Element el: video){
+            Toast.makeText(HomeActivity.this, el.attr("src"), Toast.LENGTH_SHORT).show();
+            src = el.attr("src");
+        }
+        Comun.main_url = src;
+        downloadChapter();
+
+    }
+
+    private void downloadChapter(){
+        /*DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Comun.main_url));
+        request.setDescription("Descargando capitulo");
+        request.setTitle(title);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
+
+
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+
+        Toast.makeText(HomeActivity.this, "Descarga Iniciada", Toast.LENGTH_SHORT).show();*/
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+                new MaterialDialog.Builder(HomeActivity.this)
+                        .title(name)
+                        .content("¿Deseas descargar "+name+"?")
+                        .positiveText(R.string.download)
+
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Comun.main_url));
+                                request.setDescription("Descargando capitulo");
+                                request.setTitle(title);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                    request.allowScanningByMediaScanner();
+                                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                }
+                                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
+
+
+                                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                manager.enqueue(request);
+
+                                Toast.makeText(HomeActivity.this, "Descarga Iniciada", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+    }
     private void fin(){
         mSwipyRefreshLayout.setRefreshing(false);
     }
@@ -379,7 +537,7 @@ public class HomeActivity extends AppCompatActivity
                     for (Element link : links) {
                         //  System.out.println(" * video:"+ link.attr("src"));
                         IframeLink iframe = new IframeLink(link.attr("src"));
-                        if(iframe.getUrl().contains("mundoasia")){
+                        if(iframe.getUrl().contains("estrenosdoramas.us")){
                             //System.out.println("----->"+iframe.getUrl());
                             arrayIframes.add(iframe);
                         }
@@ -391,8 +549,10 @@ public class HomeActivity extends AppCompatActivity
                         title = cap+".mp4";
                     }
 
-                    getIframeslinks();
+                    //getIframeslinks();
                     //System.out.println(doc);
+
+                    showLinks();
                 }
                 catch (Exception e)
                 {
@@ -403,6 +563,52 @@ public class HomeActivity extends AppCompatActivity
 
         thread.start();
     }
+    //parte del recore es mostrar los links disponbles
+    static int positionOption = 0;
+    private void showLinks(){
+        //progressDialog.dismiss();
+        final ArrayList<String> links = new ArrayList<>();
+
+        for (int i = 1; i <= arrayIframes.size(); i++) {
+            String link = "Opcion "+i;
+            links.add(link);
+        }
+
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new MaterialDialog.Builder(HomeActivity.this)
+                        .items(links)
+                        .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                System.out.print(which);
+                                positionOption = which;
+                                return true;
+                            }
+                        })
+                        .positiveText("Ok")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                getChapterDownloadLinks();
+                            }
+                        })
+                        .show();
+            }
+        });
+       /*
+*/
+       System.out.print("--------------------->");
+       System.out.println(links);
+    }
+
+    private void getChapterDownloadLinks() {
+        String link = arrayIframes.get(positionOption).getUrl();
+        webView.loadUrl(link);
+    }
+
     public static LinkedList<IframeLink> arrayIframes = new LinkedList();
     static String title = "";
 

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "xyz.zsckare.doramasdownloader"
         minSdkVersion 15
@@ -34,4 +34,5 @@ dependencies {
     compile 'com.github.traex.rippleeffect:library:1.2.3'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.4'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+    compile 'gun0912.ted:tedpermission:2.1.0'
 }
