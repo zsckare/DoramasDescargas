@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DoramasDescargas.iml" filepath="$PROJECT_DIR$/DoramasDescargas.iml" />
       <module fileurl="file://$PROJECT_DIR$/DoramasDescargasApp.iml" filepath="$PROJECT_DIR$/DoramasDescargasApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/DoramasDownloader.iml" filepath="$PROJECT_DIR$/DoramasDownloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
